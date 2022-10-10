@@ -15,7 +15,7 @@ def read_pages(num_page):
     if num_page == 1:
         res = requests.get('https://news.ycombinator.com/news')
         soup = BeautifulSoup(res.text, 'html.parser')
-        links = soup.select('.titlelink')
+        links = soup.select('.titleline')
         subtext = soup.select('.subtext')
         return links, subtext
     else:
@@ -25,14 +25,14 @@ def read_pages(num_page):
             if idx + 1 == 1:
                 res = requests.get('https://news.ycombinator.com/news')
                 soup = BeautifulSoup(res.text, 'html.parser')
-                links = soup.select('.titlelink')
+                links = soup.select('.titleline')
                 subtext = soup.select('.subtext')
                 list_links.append(links)
                 list_subtext.append(subtext)
             else:
                 res = requests.get(f'https://news.ycombinator.com/news?p={idx+1}')
                 soup = BeautifulSoup(res.text, 'html.parser')
-                links = soup.select('.titlelink')
+                links = soup.select('.titleline')
                 subtext = soup.select('.subtext')
                 list_links.append(links)
                 list_subtext.append(subtext)
@@ -52,8 +52,9 @@ def sort_stories_by_votes(hnlist):
 def create_custom_hm(links, subtext):
     hn = []
     for idx, item in enumerate(links):
-        title = item.getText()
-        href = item.get('href', None)
+        itemm = item.find('a')
+        title = itemm.getText()
+        href = itemm.get('href')
         # take only the links that has points
         vote = subtext[idx].select('.score')
         if len(vote):
